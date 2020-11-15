@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marksheet</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    
+    <style>
+         .customButton {
+            border: 3px solid white;
+            padding: 2px 6px 2px 6px;
+            color: white;
+            cursor: pointer;
+        }
+/*
+        .customButton:hover {
+            border: 1px solid black;
+            box-shadow: gray 2px 2px 5px;
+        } */
+    </style>
+</head>
+<body style="background-image: url(bg.jpg); background-repeat: no-repeat; background-size: cover; ">
+    <div class="container">
+    <h1 class="text-center mt-2 text-white">Marksheet</h1>
+    <div class="text-center text-white border">
+        <table>
+            <tr>
+                <td>
+                    <table>
+                        <tr>
+                            <td>
+                                <span>Enter the name of student :</span>
+                            </td>
+                            <td>
+                                <input type="text" id="nameOfStudent" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span>Enter the number of subjects : </span>
+                            </td>
+                            <td>
+                                <input type="number" id="noOfSubjects" min="1" onchange="UIPopulate()"
+                                    onkeyup="UIPopulate()" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2">
+                                <span onclick="Calculate()" class="btn btn-outline-primary customButton ">Calculate</span>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td>
+                    <table>
+                        <tr>
+                            <td>
+                                <span>Min Marks Subject: </span>
+                            </td>
+                            <td>
+                                <input type="text" id="minMarksSubject" readonly="readonly" />
+                            </td>
+                            <td>
+                                <span>Min Marks: </span>
+                            </td>
+                            <td>
+                                <input type="text" id="minMarks" readonly="readonly" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span>Max Marks Subject: </span>
+                            </td>
+                            <td>
+                                <input type="text" id="maxMarksSubject" readonly="readonly" />
+                            </td>
+                            <td>
+                                <span>Max Marks: </span>
+                            </td>
+                            <td>
+                                <input type="text" id="maxMarks" readonly="readonly" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <span>Percentage : </span>
+                            </td>
+                            <td>
+                                <input type="text" id="percentage" readonly="readonly" />
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <hr />
+    <div class="border">
+        <table id="inputTable">
+        </table>
+    </div>
+</div>
+<script src="app.js"></script>
+
+<script>
+function Calculate() {
+    //code for server side:
+    var inputSubjectList = [];
+  var noOfSubjects = $("#noOfSubjects").val();
+
+  for (i = 0; i < noOfSubjects; i++) {
+    subjectName = $("#subjectName" + i).val();
+    subjectObtainedMarks = $("#subjectMarksObtained" + i).val();
+
+    var input_subject = new Object();
+    input_subject.name = subjectName;
+    input_subject.obtainedMarks = subjectObtainedMarks;
+
+    inputSubjectList.push(input_subject);//appending in the list of subjects
+  }
+  var inputSubjectStr = JSON.stringify(inputSubjectList);
+ console.log(inputSubjectStr)
+ $.ajax({
+     method:"GET",
+     URL:"http://localhost:51043/StudentService.asmx/GenerateMarksheet",
+     contentType:"application/JSON",
+     data:{
+         request:inputSubjectStr,
+     },
+     success: function (result) {
+        var resultt = JSON.parse(result.d);
+        $("#minMarksSubject").val(resultt.minMarksSubject );
+        $("#maxMarksSubject").val(resultt.maxMarksSubject);
+        $("#minMarks").val(resultt.minMarks);
+        $("#maxMarks").val(resultt.maxMarks);
+        $("#percentage").val((resultt.percentage)+"%");
+      },
+ });
+}
+
+</script>
+
+</body>
+
+
+</html>
